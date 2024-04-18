@@ -220,7 +220,7 @@ RUN sudo apt-get -q update && \
 
 RUN cd $COLCON_WS
 RUN . /opt/ros/humble/setup.sh && colcon build --executor sequential
-
+RUN echo "source $COLCON_WS/install/setup.bash" >> ~/.bashrc
 # * Switch workspace to ~/work
 WORKDIR /home/"${USER}"/work
 
