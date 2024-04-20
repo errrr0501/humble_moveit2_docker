@@ -195,30 +195,41 @@ RUN rosdep update
 
 
 RUN sudo apt remove -y ros-humble-moveit*
-ENV COLCON_WS=/home/"${USER}"/ws_moveit2/
+ENV COLCON_WS=/home/"${USER}"/ws_moveit2
 WORKDIR $COLCON_WS
 RUN sudo mkdir src
 
 
 WORKDIR $COLCON_WS/src
 
-RUN sudo git clone https://github.com/ros-planning/moveit2.git -b main
+# RUN sudo git clone https://github.com/ros-planning/moveit2.git -b main
+
+RUN sudo git clone https://github.com/ros-planning/moveit2_tutorials
+RUN sudo vcs import < moveit2_tutorials/moveit2_tutorials.repos
+
 
 # Resolved colcon build issue
-RUN sudo wget https://github.com/PickNikRobotics/generate_parameter_library/archive/refs/tags/0.3.8.tar.gz
-RUN sudo tar -zxvf 0.3.8.tar.gz
-RUN sudo rm -rf 0.3.8.tar.gz
+# RUN sudo wget https://github.com/PickNikRobotics/generate_parameter_library/archive/refs/tags/0.3.8.tar.gz
+# RUN sudo tar -zxvf 0.3.8.tar.gz
+# RUN sudo rm -rf 0.3.8.tar.gz
 
 # COPY moveit2
 WORKDIR $COLCON_WS
-RUN sudo vcs import src < src/moveit2/moveit2.repos && \
-    if [ -r "src/moveit2/moveit2_${ROS_DISTRO}.repos" ] ; then vcs import src < "src/moveit2/moveit2_${ROS_DISTRO}.repos" ; fi
+# RUN sudo vcs import src < src/moveit2/moveit2.repos && \
+#     if [ -r "src/moveit2/moveit2_${ROS_DISTRO}.repos" ] ; then vcs import src < "src/moveit2/moveit2_${ROS_DISTRO}.repos" ; fi
+# RUN sudo apt-get -q update && \
+#     rosdep update && \
+#     DEBIAN_FRONTEND=noninteractive \
+#     rosdep install -y --from-paths src --ignore-src --rosdistro humble
+
+
 RUN sudo apt-get -q update && \
     rosdep update && \
     DEBIAN_FRONTEND=noninteractive \
     rosdep install -y --from-paths src --ignore-src --rosdistro humble
 
-RUN cd $COLCON_WS
+
+
 RUN . /opt/ros/humble/setup.sh && colcon build --executor sequential
 RUN echo "source $COLCON_WS/install/setup.bash" >> ~/.bashrc
 # * Switch workspace to ~/work
